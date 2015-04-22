@@ -15,100 +15,116 @@
   -->
 
 <project name="IDEA Coverage Agent" default="all">
-  <property name="dist" value="${basedir}/dist"/>
-  <property name="coverage.data.jar" value="${dist}/coverage-agent.jar"/>
-  <property name="instrumenter.jar" value="${dist}/instrumenter.jar"/>
-  <property name="util.jar" value="${dist}/coverage-util.jar"/>
-  <property name="src.dst" value="${dist}/coverage-src.zip"/>
-  <property name="build.rt.classes.dir" value="${basedir}/out/production"/>
-  <property environment="env"/>
+	<property name="dist" value="${basedir}/dist"/>
+	<property name="coverage.data.jar" value="${dist}/coverage-agent.jar"/>
+	<property name="instrumenter.jar" value="${dist}/instrumenter.jar"/>
+	<property name="util.jar" value="${dist}/coverage-util.jar"/>
+	<property name="src.dst" value="${dist}/coverage-src.zip"/>
+	<property name="build.rt.classes.dir" value="${basedir}/out/production"/>
+	<property environment="env"/>
 
-  <target name="src">
-    <delete file="${src.dst}"/>
-    <property name ="temp.src" value="${dist}/src/com/intellij/rt/coverage"/>
-    <mkdir dir="${temp.src}"/>
-    <copy todir="${temp.src}" includeemptydirs="true">
-      <!-- coverage module src -->
-      <fileset dir="${basedir}/src" includes="com/**"/>
-      <!-- instrumentation module src -->
-      <fileset dir="${basedir}/instrumentation/src" includes="instrumentation/**"/>
-      <!-- util module src -->
-      <fileset dir="${basedir}/util/src" includes="util/**"/>
-    </copy>
-    <zip destfile="${src.dst}">
-      <fileset dir="${dist}/src" includes="com/intellij/rt/coverage/**"/>
-    </zip>
-    <delete dir="${dist}/src"/>
-  </target>
+	<target name="src">
+		<delete file="${src.dst}"/>
+		<property name="temp.src" value="${dist}/src/com/intellij/rt/coverage"/>
+		<mkdir dir="${temp.src}"/>
+		<copy todir="${temp.src}" includeemptydirs="true">
+			<!-- coverage module src -->
+			<fileset dir="${basedir}/src" includes="com/**"/>
+			<!-- instrumentation module src -->
+			<fileset dir="${basedir}/instrumentation/src" includes="instrumentation/**"/>
+			<!-- util module src -->
+			<fileset dir="${basedir}/util/src" includes="util/**"/>
+		</copy>
+		<zip destfile="${src.dst}">
+			<fileset dir="${dist}/src" includes="com/intellij/rt/coverage/**"/>
+		</zip>
+		<delete dir="${dist}/src"/>
+	</target>
 
-  <target name="all" depends="src">
-    <delete dir="${coverage.data.jar}"/>
-    <delete dir="${instrumenter.jar}"/>
-    <mkdir dir="${dist}"/>
+	<target name="all" depends="src">
+		<delete dir="${coverage.data.jar}"/>
+		<delete dir="${instrumenter.jar}"/>
+		<mkdir dir="${dist}"/>
 
-    <jar destfile="${coverage.data.jar}">
-      <manifest>
-        <attribute name="Premain-Class" value="com.intellij.rt.coverage.main.CoveragePremain"/>
-        <attribute name="Boot-Class-Path" value="coverage-agent.jar"/>
-      </manifest>
+		<jar destfile="${coverage.data.jar}">
+			<manifest>
+				<attribute name="Premain-Class" value="com.intellij.rt.coverage.main.CoveragePremain"/>
+				<attribute name="Boot-Class-Path" value="coverage-agent.jar"/>
+			</manifest>
 
-      <fileset dir="${build.rt.classes.dir}/coverage" includes="com/intellij/rt/coverage/data/**"/>
-      <fileset dir="${build.rt.classes.dir}/coverage" includes="com/intellij/rt/coverage/main/**"/>
-      <fileset dir="${build.rt.classes.dir}/coverage" includes="com/intellij/rt/coverage/util/**"/>
-    </jar>
-    <jar destfile="${instrumenter.jar}">
-      <fileset dir="${build.rt.classes.dir}/instrumentation" includes="com/intellij/rt/coverage/instrumentation/**"/>
-      <fileset dir="${build.rt.classes.dir}/util" includes="com/intellij/rt/coverage/util/**"/>
-    </jar>
-    <jar destfile="${util.jar}">
-      <fileset dir="${build.rt.classes.dir}/util" includes="com/intellij/rt/coverage/util/**"/>
-    </jar>
+			<fileset dir="${build.rt.classes.dir}/consulo-java-coverage-agent"
+					 includes="com/intellij/rt/coverage/data/**"/>
+			<fileset dir="${build.rt.classes.dir}/consulo-java-coverage-agent"
+					 includes="com/intellij/rt/coverage/main/**"/>
+			<fileset dir="${build.rt.classes.dir}/consulo-java-coverage-agent"
+					 includes="com/intellij/rt/coverage/util/**"/>
+		</jar>
+		<jar destfile="${instrumenter.jar}">
+			<fileset dir="${build.rt.classes.dir}/instrumentation"
+					 includes="com/intellij/rt/coverage/instrumentation/**"/>
+			<fileset dir="${build.rt.classes.dir}/util" includes="com/intellij/rt/coverage/util/**"/>
+		</jar>
+		<jar destfile="${util.jar}">
+			<fileset dir="${build.rt.classes.dir}/util" includes="com/intellij/rt/coverage/util/**"/>
+		</jar>
 
 
-    <copy todir="${dist}" file="${basedir}/lib/asm-all.jar"/>
-    <copy todir="${dist}" file="${basedir}/lib/trove4j.jar"/>
-  </target>
-  <target name="test" description="run tests" depends="all">
-    <condition property="jdk_with_tools_jar"><not><available file="${java.home}/lib/tools.jar"/></not></condition>
-    <condition property="jre_with_tools_jar"><not><available file="${java.home}/../lib/tools.jar"/></not></condition>
-    <!--<available file="${java.home}/../lib/tools.jar" property="jre_with_tools_jar"/>-->
-    <condition property="tools_jar_found">
-        <or><isfalse value="${jdk_with_tools_jar}"/><isfalse value="${jre_with_tools_jar}"/></or>
-    </condition>
-    <fail unless="${tools_jar_found}" message="tools.jar wasn't found neither in ${java.home}/lib/tools.jar nor ${java.home}/../lib/tools.jar"/>
-    <junit fork="true" dir="${basedir}" failureproperty="junit.failed">
-      <classpath>
-        <fileset dir="${java.home}">
-          <include name="jre/lib/*.jar" unless="${jdk_with_tools_jar}"/>
-          <include name="lib/tools.jar" unless="${jdk_with_tools_jar}"/>
-        </fileset>
-        <fileset dir="${java.home}/..">
-          <include name="jre/lib/*.jar" unless="${jre_with_tools_jar}"/>
-          <include name="lib/tools.jar" unless="${jre_with_tools_jar}"/>
-        </fileset>
-        <pathelement location="${basedir}\tests\lib\junit.jar"/>
-        <pathelement location="${basedir}\out\test\tests"/>
-        <pathelement location="${basedir}\out\production\coverage"/>
-        <pathelement location="${basedir}\out\production\util"/>
-        <pathelement location="${basedir}\out\production\instrumentation"/>
-        <pathelement location="${basedir}\lib\trove4j.jar"/>
-        <pathelement location="${basedir}\lib\asm-all.jar"/>
-      </classpath>
-      <formatter type="plain" />
-      <test name="com.intellij.rt.coverage.CoverageStatusTest"/>
-      <test name="com.intellij.rt.coverage.CoverageMergeTest"/>
-      <test name="com.intellij.rt.coverage.FilteringTest"/>
-      <test name="com.intellij.rt.coverage.SourceMapTest"/>
-    </junit>
-    <fail if="junit.failed"/>
-  </target>
-    <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="${basedir}/lib/jarjar-1.0.jar"/>
-    <target name="prepare libs">
-        <delete file="${basedir}/lib/asm-all.jar"/>
-        <jarjar jarfile="${basedir}/lib/asm-all.jar">
-            <zipfileset src="${basedir}/lib/asm-all-5.0.jar"/>
-            <rule pattern="org.objectweb.asm.**" result="org.jetbrains.org.objectweb.asm.@1"/>
-        </jarjar>
-    </target>
+		<copy todir="${dist}" file="${basedir}/lib/asm-all.jar"/>
+		<copy todir="${dist}" file="${basedir}/lib/trove4j.jar"/>
+	</target>
+	<target name="test" description="run tests" depends="all">
+		<condition property="jdk_with_tools_jar">
+			<not>
+				<available file="${java.home}/lib/tools.jar"/>
+			</not>
+		</condition>
+		<condition property="jre_with_tools_jar">
+			<not>
+				<available file="${java.home}/../lib/tools.jar"/>
+			</not>
+		</condition>
+		<!--<available file="${java.home}/../lib/tools.jar" property="jre_with_tools_jar"/>-->
+		<condition property="tools_jar_found">
+			<or>
+				<isfalse value="${jdk_with_tools_jar}"/>
+				<isfalse value="${jre_with_tools_jar}"/>
+			</or>
+		</condition>
+		<fail unless="${tools_jar_found}"
+			  message="tools.jar wasn't found neither in ${java.home}/lib/tools.jar nor ${java.home}/../lib/tools.jar"/>
+		<junit fork="true" dir="${basedir}" failureproperty="junit.failed">
+			<classpath>
+				<fileset dir="${java.home}">
+					<include name="jre/lib/*.jar" unless="${jdk_with_tools_jar}"/>
+					<include name="lib/tools.jar" unless="${jdk_with_tools_jar}"/>
+				</fileset>
+				<fileset dir="${java.home}/..">
+					<include name="jre/lib/*.jar" unless="${jre_with_tools_jar}"/>
+					<include name="lib/tools.jar" unless="${jre_with_tools_jar}"/>
+				</fileset>
+				<pathelement location="${basedir}\tests\lib\junit.jar"/>
+				<pathelement location="${basedir}\out\test\tests"/>
+				<pathelement location="${basedir}\out\production\coverage"/>
+				<pathelement location="${basedir}\out\production\util"/>
+				<pathelement location="${basedir}\out\production\instrumentation"/>
+				<pathelement location="${basedir}\lib\trove4j.jar"/>
+				<pathelement location="${basedir}\lib\asm-all.jar"/>
+			</classpath>
+			<formatter type="plain"/>
+			<test name="com.intellij.rt.coverage.CoverageStatusTest"/>
+			<test name="com.intellij.rt.coverage.CoverageMergeTest"/>
+			<test name="com.intellij.rt.coverage.FilteringTest"/>
+			<test name="com.intellij.rt.coverage.SourceMapTest"/>
+		</junit>
+		<fail if="junit.failed"/>
+	</target>
+	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="${basedir}/lib/jarjar-1.0.jar"/>
+	<target name="prepare libs">
+		<delete file="${basedir}/lib/asm-all.jar"/>
+		<jarjar jarfile="${basedir}/lib/asm-all.jar">
+			<zipfileset src="${basedir}/lib/asm-all-5.0.jar"/>
+			<rule pattern="org.objectweb.asm.**" result="org.jetbrains.org.objectweb.asm.@1"/>
+		</jarjar>
+	</target>
 </project>
 
