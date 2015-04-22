@@ -16,14 +16,14 @@
 
 package com.intellij.rt.coverage.main;
 
-import com.intellij.rt.coverage.util.URLsUtil;
-
 import java.io.File;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+
+import com.intellij.rt.coverage.util.URLsUtil;
 
 /**
  * @author anna
@@ -34,9 +34,9 @@ public class CoveragePremain {
   public static void premain(String argsString, Instrumentation instrumentation) throws Exception {
     final File lib = new File(getArchivePath()).getParentFile();
     final URL[] urls = new URL[3];
-    urls[0] = fileToURL(new File(lib, "instrumenter.jar"));
-    urls[1] = fileToURL(new File(lib, "asm-all.jar"));
-    urls[2] = fileToURL(new File(lib, "trove4j.jar"));
+    urls[0] = fileToURL(new File(lib, "coverage-instrumenter.jar"));
+    urls[1] = fileToURL(new File(lib, "consulo-internal-asm-all.jar"));
+    urls[2] = fileToURL(new File(lib, "consulo-internal-trove4j.jar"));
 
     final Class instrumentator = Class.forName("com.intellij.rt.coverage.instrumentation.Instrumentator", true, new URLClassLoader(urls) {
       protected Class loadClass(String name, boolean resolve) throws ClassNotFoundException {

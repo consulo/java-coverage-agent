@@ -1,4 +1,6 @@
 dist
+build
 out
 .idea/workspace.xml
+.consulo/workspace.xml
 *.class

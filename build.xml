@@ -15,12 +15,16 @@
   -->
 
 <project name="IDEA Coverage Agent" default="all">
-	<property name="dist" value="${basedir}/dist"/>
+	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="${basedir}/lib/jarjar-1.0.jar"/>
+
+	<property name="dist" value="${basedir}/build"/>
+	<property name="build.classes" value="${dist}/classes"/>
+
 	<property name="coverage.data.jar" value="${dist}/coverage-agent.jar"/>
-	<property name="instrumenter.jar" value="${dist}/instrumenter.jar"/>
+	<property name="instrumenter.jar" value="${dist}/coverage-instrumenter.jar"/>
 	<property name="util.jar" value="${dist}/coverage-util.jar"/>
+
 	<property name="src.dst" value="${dist}/coverage-src.zip"/>
-	<property name="build.rt.classes.dir" value="${basedir}/out/production"/>
 	<property environment="env"/>
 
 	<target name="src">
@@ -42,88 +46,86 @@
 	</target>
 
 	<target name="all" depends="src">
-		<delete dir="${coverage.data.jar}"/>
-		<delete dir="${instrumenter.jar}"/>
+		<delete dir="${dist}"/>
 		<mkdir dir="${dist}"/>
+		<mkdir dir="${build.classes}"/>
+		<mkdir dir="${dist}/temp"/>
 
-		<jar destfile="${coverage.data.jar}">
+		<copy todir="${dist}/temp" file="${basedir}/lib/asm-all-5.0.jar"/>
+		<copy todir="${dist}/temp" file="${basedir}/lib/trove4j.jar"/>
+
+		<path id="javac.classpath">
+			<pathelement path="${dist}/temp/coverage-agent.jar"/>
+			<pathelement path="${dist}/temp/coverage-util.jar"/>
+			<pathelement path="${dist}/temp/trove4j.jar"/>
+			<pathelement path="${dist}/temp/asm-all-5.0.jar"/>
+		</path>
+
+		<!--agent-->
+		<mkdir dir="${build.classes}/coverage-agent/"/>
+
+		<javac srcdir="src/" destdir="${build.classes}/coverage-agent/" source="1.5" target="1.5"/>
+
+		<jar destfile="${dist}/temp/coverage-agent.jar">
 			<manifest>
 				<attribute name="Premain-Class" value="com.intellij.rt.coverage.main.CoveragePremain"/>
 				<attribute name="Boot-Class-Path" value="coverage-agent.jar"/>
 			</manifest>
 
-			<fileset dir="${build.rt.classes.dir}/consulo-java-coverage-agent"
-					 includes="com/intellij/rt/coverage/data/**"/>
-			<fileset dir="${build.rt.classes.dir}/consulo-java-coverage-agent"
-					 includes="com/intellij/rt/coverage/main/**"/>
-			<fileset dir="${build.rt.classes.dir}/consulo-java-coverage-agent"
-					 includes="com/intellij/rt/coverage/util/**"/>
-		</jar>
-		<jar destfile="${instrumenter.jar}">
-			<fileset dir="${build.rt.classes.dir}/instrumentation"
-					 includes="com/intellij/rt/coverage/instrumentation/**"/>
-			<fileset dir="${build.rt.classes.dir}/util" includes="com/intellij/rt/coverage/util/**"/>
-		</jar>
-		<jar destfile="${util.jar}">
-			<fileset dir="${build.rt.classes.dir}/util" includes="com/intellij/rt/coverage/util/**"/>
+			<fileset dir="${build.classes}/coverage-agent/" includes="**/**"/>
 		</jar>
 
+		<!--util-->
+		<mkdir dir="${build.classes}/coverage-util/"/>
 
-		<copy todir="${dist}" file="${basedir}/lib/asm-all.jar"/>
-		<copy todir="${dist}" file="${basedir}/lib/trove4j.jar"/>
-	</target>
-	<target name="test" description="run tests" depends="all">
-		<condition property="jdk_with_tools_jar">
-			<not>
-				<available file="${java.home}/lib/tools.jar"/>
-			</not>
-		</condition>
-		<condition property="jre_with_tools_jar">
-			<not>
-				<available file="${java.home}/../lib/tools.jar"/>
-			</not>
-		</condition>
-		<!--<available file="${java.home}/../lib/tools.jar" property="jre_with_tools_jar"/>-->
-		<condition property="tools_jar_found">
-			<or>
-				<isfalse value="${jdk_with_tools_jar}"/>
-				<isfalse value="${jre_with_tools_jar}"/>
-			</or>
-		</condition>
-		<fail unless="${tools_jar_found}"
-			  message="tools.jar wasn't found neither in ${java.home}/lib/tools.jar nor ${java.home}/../lib/tools.jar"/>
-		<junit fork="true" dir="${basedir}" failureproperty="junit.failed">
-			<classpath>
-				<fileset dir="${java.home}">
-					<include name="jre/lib/*.jar" unless="${jdk_with_tools_jar}"/>
-					<include name="lib/tools.jar" unless="${jdk_with_tools_jar}"/>
-				</fileset>
-				<fileset dir="${java.home}/..">
-					<include name="jre/lib/*.jar" unless="${jre_with_tools_jar}"/>
-					<include name="lib/tools.jar" unless="${jre_with_tools_jar}"/>
-				</fileset>
-				<pathelement location="${basedir}\tests\lib\junit.jar"/>
-				<pathelement location="${basedir}\out\test\tests"/>
-				<pathelement location="${basedir}\out\production\coverage"/>
-				<pathelement location="${basedir}\out\production\util"/>
-				<pathelement location="${basedir}\out\production\instrumentation"/>
-				<pathelement location="${basedir}\lib\trove4j.jar"/>
-				<pathelement location="${basedir}\lib\asm-all.jar"/>
-			</classpath>
-			<formatter type="plain"/>
-			<test name="com.intellij.rt.coverage.CoverageStatusTest"/>
-			<test name="com.intellij.rt.coverage.CoverageMergeTest"/>
-			<test name="com.intellij.rt.coverage.FilteringTest"/>
-			<test name="com.intellij.rt.coverage.SourceMapTest"/>
-		</junit>
-		<fail if="junit.failed"/>
-	</target>
-	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="${basedir}/lib/jarjar-1.0.jar"/>
-	<target name="prepare libs">
-		<delete file="${basedir}/lib/asm-all.jar"/>
-		<jarjar jarfile="${basedir}/lib/asm-all.jar">
-			<zipfileset src="${basedir}/lib/asm-all-5.0.jar"/>
-			<rule pattern="org.objectweb.asm.**" result="org.jetbrains.org.objectweb.asm.@1"/>
+		<javac srcdir="${basedir}/util/src" destdir="${build.classes}/coverage-util/" source="1.5" target="1.5" classpathref="javac.classpath"/>
+
+		<jar destfile="${dist}/temp/coverage-util.jar">
+			<fileset dir="${build.classes}/coverage-util/" includes="**/**"/>
+		</jar>
+
+		<!--instrumental  -->
+		<mkdir dir="${build.classes}/coverage-instrumenter/" />
+
+		<javac srcdir="${basedir}/instrumentation/src" destdir="${build.classes}/coverage-instrumenter/" source="1.5"
+			   target="1.5" classpathref="javac.classpath"/>
+
+		<jar destfile="${dist}/temp/coverage-instrumenter.jar">
+			<fileset dir="${build.classes}/coverage-instrumenter/" includes="**/**"/>
+		</jar>
+
+		<!--patch libraries-->
+		<jarjar jarfile="${dist}/consulo-internal-trove4j.jar">
+			<zipfileset src="${dist}/temp/trove4j.jar"/>
+
+			<rule pattern="gnu.trove.**" result="consulo.internal.org.gnu.trove.@1"/>
+		</jarjar>
+
+		<jarjar jarfile="${dist}/consulo-internal-asm-all.jar">
+			<zipfileset src="${dist}/temp/asm-all-5.0.jar"/>
+
+			<rule pattern="org.objectweb.asm.**" result="consulo.internal.org.objectweb.asm.@1"/>
+		</jarjar>
+
+		<jarjar jarfile="${dist}/coverage-agent.jar">
+			<zipfileset src="${dist}/temp/coverage-agent.jar"/>
+
+			<rule pattern="gnu.trove.**" result="consulo.internal.org.gnu.trove.@1"/>
+			<rule pattern="org.objectweb.asm.**" result="consulo.internal.org.objectweb.asm.@1"/>
+		</jarjar>
+
+		<jarjar jarfile="${dist}/coverage-util.jar">
+			<zipfileset src="${dist}/temp/coverage-util.jar"/>
+
+			<rule pattern="gnu.trove.**" result="consulo.internal.org.gnu.trove.@1"/>
+			<rule pattern="org.objectweb.asm.**" result="consulo.internal.org.objectweb.asm.@1"/>
+		</jarjar>
+
+		<jarjar jarfile="${dist}/coverage-instrumenter.jar">
+			<zipfileset src="${dist}/temp/coverage-instrumenter.jar"/>
+
+			<rule pattern="gnu.trove.**" result="consulo.internal.org.gnu.trove.@1"/>
+			<rule pattern="org.objectweb.asm.**" result="consulo.internal.org.objectweb.asm.@1"/>
 		</jarjar>
 	</target>
 </project>
