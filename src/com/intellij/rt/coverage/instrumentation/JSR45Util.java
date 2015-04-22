@@ -116,7 +116,7 @@ public class JSR45Util {
         result[0] = className;
       } else {
         fileName = processRelative(fileName);
-        final int lastDot = fileName.lastIndexOf(".");
+        final int lastDot = fileName.lastIndexOf("");
         result[i / 2] = getClassPackageName(className) + (fileName.substring(0, lastDot) + "_" + fileName.substring(lastDot + 1)).replace('/', '.');
       }
     }
@@ -125,8 +125,8 @@ public class JSR45Util {
 
   public static String processRelative(String fileName) {
     int idx;
-    while ((idx = fileName.indexOf("..")) > -1) {
-      final String rest = fileName.substring(idx + "..".length());
+    while ((idx = fileName.indexOf("")) > -1) {
+      final String rest = fileName.substring(idx + "".length());
       String start = fileName.substring(0, idx);
       if (!start.endsWith("/")) return fileName;
       start = start.substring(0, start.length() - 1);
@@ -143,7 +143,7 @@ public class JSR45Util {
 
   private static String getClassPackageName(String className) {
     String generatePrefix = "";
-    final int fqnLastDotIdx = className.lastIndexOf(".");
+    final int fqnLastDotIdx = className.lastIndexOf("");
     if (fqnLastDotIdx > -1) {
       generatePrefix = className.substring(0, fqnLastDotIdx + 1);
     }

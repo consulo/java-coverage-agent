@@ -16,17 +16,11 @@
 
 package com.intellij.rt.coverage.instrumentation;
 
-import com.intellij.rt.coverage.data.ProjectData;
-import com.intellij.rt.coverage.util.ClassNameUtil;
-import com.intellij.rt.coverage.util.ErrorReporter;
-import com.intellij.rt.coverage.util.ProjectDataLoader;
-import com.intellij.rt.coverage.util.classFinder.ClassFinder;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
@@ -36,6 +30,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
+import com.intellij.rt.coverage.data.ProjectData;
+import com.intellij.rt.coverage.util.ClassNameUtil;
+import com.intellij.rt.coverage.util.ErrorReporter;
+import com.intellij.rt.coverage.util.ProjectDataLoader;
+import com.intellij.rt.coverage.util.classFinder.ClassFinder;
 
 
 public class Instrumentator {
