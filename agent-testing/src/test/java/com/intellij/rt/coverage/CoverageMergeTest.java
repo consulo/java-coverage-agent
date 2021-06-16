@@ -30,7 +30,7 @@ import java.util.*;
  * @author Anna.Kozlova
  * @since 1/19/11
  */
-public class CoverageMergeTest extends TestCase
+public abstract class CoverageMergeTest extends TestCase
 {
 	private static final String COMMON = "Common";
 	private Set<File> myFiles2Delete = new HashSet<File>();
@@ -60,7 +60,7 @@ public class CoverageMergeTest extends TestCase
 		super.tearDown();
 	}
 
-	public void _testSimple() throws Exception
+	public void testSimple() throws Exception
 	{
 		doTest("simple",
 				//Test1
@@ -85,7 +85,7 @@ public class CoverageMergeTest extends TestCase
 						"1:FULL\n" + "4:FULL\n" + "7:FULL\n");
 	}
 
-	public void _testJumps() throws Exception
+	public void testJumps() throws Exception
 	{
 		doTest("jumps",
 				//Test1
