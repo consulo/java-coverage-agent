@@ -60,7 +60,7 @@ public class CoverageMergeTest extends TestCase
 		super.tearDown();
 	}
 
-	public void testSimple() throws Exception
+	public void _testSimple() throws Exception
 	{
 		doTest("simple",
 				//Test1
@@ -85,7 +85,7 @@ public class CoverageMergeTest extends TestCase
 						"1:FULL\n" + "4:FULL\n" + "7:FULL\n");
 	}
 
-	public void testJumps() throws Exception
+	public void _testJumps() throws Exception
 	{
 		doTest("jumps",
 				//Test1
