@@ -115,6 +115,8 @@ public class CoverageMergeTest extends TestCase
 
 
 		if(Main.compile(new String[]{
+				"-target",
+				"8",
 				testDataPath + File.separator + className + ".java",
 				testDataPath + File.separator + COMMON + ".java",
 		}) != 0)

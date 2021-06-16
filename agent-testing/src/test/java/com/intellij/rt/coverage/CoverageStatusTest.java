@@ -98,7 +98,11 @@ public class CoverageStatusTest extends TestCase
 
 		myDataFile = new File(testDataPath + File.separator + "Test.ic");
 
-		if(Main.compile(new String[]{testDataPath + File.separator + "Test.java"}) != 0)
+		if(Main.compile(new String[]{
+				"-target",
+				"8",
+				testDataPath + File.separator + "Test.java"
+		}) != 0)
 		{
 			throw new RuntimeException("Compilation failed");
 		}
