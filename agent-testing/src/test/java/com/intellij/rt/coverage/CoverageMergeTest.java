@@ -16,19 +16,15 @@
 
 package com.intellij.rt.coverage;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.intellij.rt.coverage.data.ClassData;
 import com.intellij.rt.coverage.data.LineData;
 import com.intellij.rt.coverage.data.ProjectData;
-import com.sun.tools.javac.Main;
 import consulo.java.coverage.TestPathUtil;
+import javi.compiler.Main;
 import junit.framework.TestCase;
+
+import java.io.File;
+import java.util.*;
 
 /**
  * @author Anna.Kozlova

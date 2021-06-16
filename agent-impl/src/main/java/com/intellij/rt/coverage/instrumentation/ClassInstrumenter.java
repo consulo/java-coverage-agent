@@ -16,19 +16,18 @@
 
 package com.intellij.rt.coverage.instrumentation;
 
-import org.jetbrains.org.objectweb.asm.ClassVisitor;
-import org.jetbrains.org.objectweb.asm.MethodVisitor;
 import com.intellij.rt.coverage.data.LineData;
 import com.intellij.rt.coverage.data.ProjectData;
 import com.intellij.rt.coverage.util.LinesUtil;
+import consulo.internal.org.objectweb.asm.ClassVisitor;
+import consulo.internal.org.objectweb.asm.MethodVisitor;
 
 public class ClassInstrumenter extends Instrumenter {
   public ClassInstrumenter(final ProjectData projectData, ClassVisitor classVisitor, String className, boolean shouldCalculateSource) {
     super(projectData, classVisitor, className, shouldCalculateSource);
   }
 
-  protected MethodVisitor createMethodLineEnumerator(MethodVisitor mv, String name, String desc, int access, String signature,
-                                           String[] exceptions) {
+  protected MethodVisitor createMethodLineEnumerator(MethodVisitor mv, String name, String desc, int access, String signature,  String[] exceptions) {
     return new LineEnumerator(this, mv, access, name, desc, signature, exceptions);
   }
 

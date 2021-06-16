@@ -16,17 +16,16 @@
 
 package com.intellij.rt.coverage.instrumentation;
 
+import com.intellij.rt.coverage.data.ClassData;
+import com.intellij.rt.coverage.data.ProjectData;
+import consulo.internal.org.objectweb.asm.ClassVisitor;
+import consulo.internal.org.objectweb.asm.Label;
+import consulo.internal.org.objectweb.asm.MethodVisitor;
+import consulo.internal.org.objectweb.asm.Opcodes;
 import gnu.trove.TIntObjectHashMap;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import org.jetbrains.org.objectweb.asm.ClassVisitor;
-import org.jetbrains.org.objectweb.asm.Label;
-import org.jetbrains.org.objectweb.asm.MethodVisitor;
-import org.jetbrains.org.objectweb.asm.Opcodes;
-import com.intellij.rt.coverage.data.ClassData;
-import com.intellij.rt.coverage.data.ProjectData;
 
 /**
  * @author anna
@@ -44,7 +43,7 @@ public class SourceLineCounter extends ClassVisitor {
   private boolean myEnum;
 
   public SourceLineCounter(final ClassData classData, final boolean excludeLines, final ProjectData projectData) {
-    super(Opcodes.ASM5, new ClassVisitor(Opcodes.ASM5) {});
+    super(Opcodes.API_VERSION, new ClassVisitor(Opcodes.API_VERSION) {});
     myProjectData = projectData;
     myClassData = classData;
     myExcludeLines = excludeLines;
@@ -71,10 +70,10 @@ public class SourceLineCounter extends ClassVisitor {
   }
 
   public MethodVisitor visitMethod(final int access,
-                                   final String name,
-                                   final String desc,
-                                   final String signature,
-                                   final String[] exceptions) {
+								   final String name,
+								   final String desc,
+								   final String signature,
+								   final String[] exceptions) {
     final MethodVisitor v = cv.visitMethod(access, name, desc, signature, exceptions);
     if (myInterface) return v;
     if ((access & Opcodes.ACC_BRIDGE) != 0) return v;
@@ -83,7 +82,7 @@ public class SourceLineCounter extends ClassVisitor {
       if (name.equals("valueOf") && desc.startsWith("(Ljava/lang/String;)L")) return v;
       if (name.equals("<init>") && signature != null && signature.equals("()V")) return v;
     }
-    return new MethodVisitor(Opcodes.ASM5, v) {
+    return new MethodVisitor(Opcodes.API_VERSION, v) {
       private boolean myHasInstructions;
 
 

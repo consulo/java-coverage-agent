@@ -16,15 +16,14 @@
 
 package com.intellij.rt.coverage.instrumentation;
 
-import gnu.trove.TIntObjectHashMap;
-
-import org.jetbrains.org.objectweb.asm.ClassVisitor;
-import org.jetbrains.org.objectweb.asm.MethodVisitor;
-import org.jetbrains.org.objectweb.asm.Opcodes;
 import com.intellij.rt.coverage.data.ClassData;
 import com.intellij.rt.coverage.data.LineData;
 import com.intellij.rt.coverage.data.ProjectData;
 import com.intellij.rt.coverage.util.StringsPool;
+import consulo.internal.org.objectweb.asm.ClassVisitor;
+import consulo.internal.org.objectweb.asm.MethodVisitor;
+import consulo.internal.org.objectweb.asm.Opcodes;
+import gnu.trove.TIntObjectHashMap;
 
 public abstract class Instrumenter extends ClassVisitor {
   protected final ProjectData myProjectData;
@@ -40,7 +39,7 @@ public abstract class Instrumenter extends ClassVisitor {
   private boolean myEnum;
 
   public Instrumenter(final ProjectData projectData, ClassVisitor classVisitor, String className, boolean shouldCalculateSource) {
-    super(Opcodes.ASM5, classVisitor);
+    super(Opcodes.API_VERSION, classVisitor);
     myProjectData = projectData;
     myClassVisitor = classVisitor;
     myClassName = className;
@@ -56,10 +55,10 @@ public abstract class Instrumenter extends ClassVisitor {
 
 
   public MethodVisitor visitMethod(final int access,
-                                   final String name,
-                                   final String desc,
-                                   final String signature,
-                                   final String[] exceptions) {
+								   final String name,
+								   final String desc,
+								   final String signature,
+								   final String[] exceptions) {
     final MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
     if (mv == null) return mv;
     if ((access & Opcodes.ACC_BRIDGE) != 0) return mv; //try to skip bridge methods

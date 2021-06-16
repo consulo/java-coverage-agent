@@ -16,13 +16,14 @@
 
 package com.intellij.rt.coverage.instrumentation;
 
-import org.jetbrains.org.objectweb.asm.Label;
-import org.jetbrains.org.objectweb.asm.MethodVisitor;
-import org.jetbrains.org.objectweb.asm.Opcodes;
-import org.jetbrains.org.objectweb.asm.Type;
 import com.intellij.rt.coverage.data.ProjectData;
+import consulo.internal.org.objectweb.asm.Label;
+import consulo.internal.org.objectweb.asm.MethodVisitor;
+import consulo.internal.org.objectweb.asm.Opcodes;
+import consulo.internal.org.objectweb.asm.Type;
 
-public class TouchCounter extends MethodVisitor implements Opcodes {
+public class TouchCounter extends MethodVisitor implements Opcodes
+{
   private final int myVariablesCount;
 
   private final LineEnumerator myEnumerator;
@@ -43,7 +44,7 @@ public class TouchCounter extends MethodVisitor implements Opcodes {
   private byte myState;
 
   public TouchCounter(final LineEnumerator enumerator, int access, String desc) {
-    super(Opcodes.ASM5, enumerator.getWV());
+    super(Opcodes.API_VERSION, enumerator.getWV());
     myEnumerator = enumerator;
     int variablesCount = ((Opcodes.ACC_STATIC & access) != 0) ? 0 : 1;
     final Type[] args = Type.getArgumentTypes(desc);

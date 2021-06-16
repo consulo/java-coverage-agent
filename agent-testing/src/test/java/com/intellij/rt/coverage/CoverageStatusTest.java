@@ -16,19 +16,18 @@
 
 package com.intellij.rt.coverage;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
 import com.intellij.rt.coverage.data.ClassData;
 import com.intellij.rt.coverage.data.LineData;
 import com.intellij.rt.coverage.data.ProjectData;
 import com.intellij.rt.coverage.util.ProjectDataLoader;
-import com.sun.tools.javac.Main;
 import consulo.java.coverage.TestPathUtil;
+import javi.compiler.Main;
 import junit.framework.Assert;
 import junit.framework.TestCase;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * @author anna
@@ -108,7 +107,7 @@ public class CoverageStatusTest extends TestCase
 
 		final ProjectData projectInfo = runCoverage(testDataPath, myDataFile, "Test(\\$.*)*", "Test", sampling);
 
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 
 		final ClassData classInfo = projectInfo.getClassData("Test");
 
@@ -123,13 +122,7 @@ public class CoverageStatusTest extends TestCase
 				lines.add((LineData) object);
 			}
 		}
-		Collections.sort(lines, new Comparator<LineData>()
-		{
-			public int compare(final LineData l1, final LineData l2)
-			{
-				return l1.getLineNumber() - l2.getLineNumber();
-			}
-		});
+		Collections.sort(lines, (l1, l2) -> l1.getLineNumber() - l2.getLineNumber());
 		for(LineData info : lines)
 		{
 			buf.append(info.getLineNumber()).append(":").append(info.getStatus() == 0 ? "NONE" : info.getStatus() == 1 ? "PARTIAL" : "FULL").append("\n");
@@ -160,15 +153,19 @@ public class CoverageStatusTest extends TestCase
 				testDataPath,
 				classToRun
 		};
-		StringBuffer cmd = new StringBuffer();
+		StringBuilder cmd = new StringBuilder();
 		for(String s : commandLine)
 		{
 			cmd.append(s).append(" ");
 		}
 		System.out.println(cmd);
 
-		final Process process = Runtime.getRuntime().exec(commandLine);
-		process.waitFor();
+		final Process process = new ProcessBuilder().command(commandLine).inheritIO().start();
+		int i = process.waitFor();
+		if(i != 0)
+		{
+			throw new IllegalArgumentException("failed with code " + i);
+		}
 		process.destroy();
 
 		int retries = 0;

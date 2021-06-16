@@ -16,18 +16,14 @@
 
 package com.intellij.rt.coverage.instrumentation;
 
+import com.intellij.rt.coverage.data.LineData;
+import consulo.internal.org.objectweb.asm.*;
+import consulo.internal.org.objectweb.asm.tree.MethodNode;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.jetbrains.org.objectweb.asm.AnnotationVisitor;
-import org.jetbrains.org.objectweb.asm.Label;
-import org.jetbrains.org.objectweb.asm.MethodVisitor;
-import org.jetbrains.org.objectweb.asm.Opcodes;
-import org.jetbrains.org.objectweb.asm.Type;
-import org.jetbrains.org.objectweb.asm.tree.MethodNode;
-import com.intellij.rt.coverage.data.LineData;
 
 public class LineEnumerator extends MethodVisitor implements Opcodes
 {
@@ -69,7 +65,7 @@ public class LineEnumerator extends MethodVisitor implements Opcodes
                         final String desc,
                         final String signature,
                         final String[] exceptions) {
-    super(Opcodes.ASM5, new MethodNode(access, name, desc, signature, exceptions));
+    super(Opcodes.API_VERSION, new MethodNode(access, name, desc, signature, exceptions));
     myClassInstrumenter = classInstrumenter;
     myWriterMethodVisitor = mv;
     myAccess = access;

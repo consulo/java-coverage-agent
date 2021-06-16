@@ -16,11 +16,17 @@
 
 package com.intellij.rt.coverage.instrumentation;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
+import com.intellij.rt.coverage.data.ProjectData;
+import com.intellij.rt.coverage.util.ClassNameUtil;
+import com.intellij.rt.coverage.util.ErrorReporter;
+import com.intellij.rt.coverage.util.ProjectDataLoader;
+import com.intellij.rt.coverage.util.classFinder.ClassFinder;
+import consulo.internal.org.objectweb.asm.ClassReader;
+import consulo.internal.org.objectweb.asm.ClassVisitor;
+import consulo.internal.org.objectweb.asm.ClassWriter;
+import consulo.internal.org.objectweb.asm.Opcodes;
+
+import java.io.*;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
@@ -30,17 +36,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import org.jetbrains.org.objectweb.asm.ClassReader;
-import org.jetbrains.org.objectweb.asm.ClassVisitor;
-import org.jetbrains.org.objectweb.asm.ClassWriter;
-import org.jetbrains.org.objectweb.asm.Opcodes;
-import com.intellij.rt.coverage.data.ProjectData;
-import com.intellij.rt.coverage.util.ClassNameUtil;
-import com.intellij.rt.coverage.util.ErrorReporter;
-import com.intellij.rt.coverage.util.ProjectDataLoader;
-import com.intellij.rt.coverage.util.classFinder.ClassFinder;
-
 
 public class Instrumentator {
 
@@ -243,7 +238,7 @@ public class Instrumentator {
 
   public static int getClassFileVersion(ClassReader reader) {
     final int[] classFileVersion = new int[1];
-    reader.accept(new ClassVisitor(Opcodes.ASM5) {
+    reader.accept(new ClassVisitor(Opcodes.API_VERSION) {
       public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         classFileVersion[0] = version;
       }

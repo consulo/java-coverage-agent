@@ -16,10 +16,10 @@
 
 package com.intellij.rt.coverage.instrumentation;
 
-import org.jetbrains.org.objectweb.asm.*;
 import com.intellij.rt.coverage.data.LineData;
 import com.intellij.rt.coverage.data.ProjectData;
 import com.intellij.rt.coverage.util.LinesUtil;
+import consulo.internal.org.objectweb.asm.*;
 
 public class SamplingInstrumenter extends Instrumenter {
   private static final String OBJECT_TYPE = "Ljava/lang/Object;";
@@ -40,7 +40,7 @@ public class SamplingInstrumenter extends Instrumenter {
       variablesCount += args[i].getSize();
     }
     final int varCount = variablesCount;
-    return new MethodVisitor(Opcodes.ASM5, mv) {
+    return new MethodVisitor(Opcodes.API_VERSION, mv) {
       private Label myStartLabel;
       private Label myEndLabel;
 

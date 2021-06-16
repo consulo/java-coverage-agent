@@ -17,10 +17,6 @@
 				<updatePolicy>interval:60</updatePolicy>
 			</snapshots>
 		</repository>
-		<repository>
-			<id>nuiton</id>
-			<url>http://maven.nuiton.org/release/</url>
-		</repository>
 	</repositories>
 
 	<build>
@@ -28,13 +24,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.8.1</version>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>11</source>
+					<target>11</target>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
-					<fork>true</fork>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
@@ -45,13 +40,13 @@
 		<dependency>
 			<groupId>consulo.internal</groupId>
 			<artifactId>java.coverage.agent</artifactId>
-			<version>1.0</version>
+			<version>2.0</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.sun</groupId>
-			<artifactId>tools</artifactId>
-			<version>1.7.0.13</version>
+			<groupId>consulo.internal</groupId>
+			<artifactId>javi-compiler</artifactId>
+			<version>16.0.6-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 
