@@ -20,7 +20,7 @@ import com.intellij.rt.coverage.data.ClassData;
 import com.intellij.rt.coverage.data.LineData;
 import com.intellij.rt.coverage.data.ProjectData;
 import consulo.java.coverage.TestPathUtil;
-import javi.compiler.Main;
+import javax.tools.ToolProvider;
 import junit.framework.TestCase;
 
 import java.io.File;
@@ -30,7 +30,7 @@ import java.util.*;
  * @author Anna.Kozlova
  * @since 1/19/11
  */
-public abstract class CoverageMergeTest extends TestCase
+public class CoverageMergeTest extends TestCase
 {
 	private static final String COMMON = "Common";
 	private Set<File> myFiles2Delete = new HashSet<File>();
@@ -114,9 +114,9 @@ public abstract class CoverageMergeTest extends TestCase
 		myFiles2Delete.add(dataFile);
 
 
-		if(Main.compile(new String[]{
-				"-target",
-				"8",
+		if(ToolProvider.getSystemJavaCompiler().run(null, null, null, new String[]{
+				"-nowarn",
+				"-proc:none",
 				testDataPath + File.separator + className + ".java",
 				testDataPath + File.separator + COMMON + ".java",
 		}) != 0)
@@ -127,7 +127,7 @@ public abstract class CoverageMergeTest extends TestCase
 		myFiles2Delete.add(new File(testDataPath + File.separator + className + ".class"));
 		myFiles2Delete.add(new File(testDataPath + File.separator + COMMON + ".class"));
 
-		return CoverageStatusTest.runCoverage(testDataPath, dataFile, ".*", className, false);
+		return CoverageStatusTest.runCoverage(testDataPath, dataFile, className + " " + COMMON, className, false);
 	}
 
 	private void doTest(String testName, String expected1, String expected2, String expectedMerged) throws Exception

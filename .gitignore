@@ -1,2 +1,4 @@
 .consulo/
 target/
+dependency-reduced-pom.xml
+coverage-error.log

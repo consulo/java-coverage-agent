@@ -21,7 +21,7 @@ import com.intellij.rt.coverage.data.LineData;
 import com.intellij.rt.coverage.data.ProjectData;
 import com.intellij.rt.coverage.util.ProjectDataLoader;
 import consulo.java.coverage.TestPathUtil;
-import javi.compiler.Main;
+import javax.tools.ToolProvider;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
@@ -51,13 +51,13 @@ public class CoverageStatusTest extends TestCase
 		doTest("simple", "1:NONE\n" + "3:FULL\n" + "4:PARTIAL\n" + "5:FULL\n" + "6:FULL\n" + "8:NONE\n" + "11:PARTIAL\n" + "13:FULL\n" + "14:FULL\n" + "16:NONE\n");
 	}
 
-	public void _testStaticFieldInInterface() throws Exception
+	public void testStaticFieldInInterface() throws Exception
 	{
 		doTest("staticFieldInInterface", "1:FULL\n" + "4:PARTIAL\n" + "5:FULL\n" + "6:FULL\n" + "7:NONE\n" + "8:NONE\n" + "11:PARTIAL\n" + "13:NONE\n" + "14:NONE\n" + "16:FULL\n" + "18:FULL\n" +
 				"19:FULL\n" + "24:FULL\n" + "29:FULL\n" + "30:FULL\n" + "34:FULL\n");
 	}
 
-	public void _testNotExpressions() throws Exception
+	public void testNotExpressions() throws Exception
 	{
 		doTest("notExpressions", "1:FULL\n" + "3:FULL\n" + "7:FULL\n" + "8:FULL\n" + "9:FULL\n" + "10:FULL\n" + "11:FULL\n" + "12:FULL\n");
 	}
@@ -98,9 +98,9 @@ public class CoverageStatusTest extends TestCase
 
 		myDataFile = new File(testDataPath + File.separator + "Test.ic");
 
-		if(Main.compile(new String[]{
-				"-target",
-				"8",
+		if(ToolProvider.getSystemJavaCompiler().run(null, null, null, new String[]{
+				"-nowarn",
+				"-proc:none",
 				testDataPath + File.separator + "Test.java"
 		}) != 0)
 		{
