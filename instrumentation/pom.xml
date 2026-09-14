@@ -26,8 +26,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
 					<encoding>UTF-8</encoding>
@@ -63,6 +63,7 @@
 						<manifestEntries>
 							<Premain-Class>com.intellij.rt.coverage.main.CoveragePremain</Premain-Class>
 							<Boot-Class-Path>${project.build.finalName}.jar</Boot-Class-Path>
+							<Can-Retransform-Classes>true</Can-Retransform-Classes>
 						</manifestEntries>
 					</archive>
 				</configuration>

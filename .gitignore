@@ -1,4 +1,11 @@
-.consulo/
-target/
-dependency-reduced-pom.xml
-coverage-error.log
+dist
+out
+*.class
+build
+.gradle
+.idea/
+.kotlin/
+gradle.properties
+/tests/external.jmh.gradle
+/*.patch
+test-kotlin/bytecode.txt

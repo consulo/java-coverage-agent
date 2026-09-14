@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2014 JetBrains s.r.o.
+ * Copyright 2000-2022 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.intellij.rt.coverage.data;
 
 /**
@@ -21,30 +20,33 @@ package com.intellij.rt.coverage.data;
  * @since 2/9/11
  */
 public class FileMapData {
-    private String myClassName;
-    private LineMapData[] myLines;
+  private final String myClassName;
+  private final String myFileName;
+  private final LineMapData[] myLines;
 
-    public FileMapData(String className, LineMapData[] lines) {
-        myClassName = className;
-        myLines = lines;
-    }
+  public FileMapData(String className, String fileName, LineMapData[] lines) {
+    myClassName = className;
+    myFileName = fileName;
+    myLines = lines;
+  }
 
-    public String getClassName() {
-        return myClassName;
-    }
+  public String getClassName() {
+    return myClassName;
+  }
 
-    public LineMapData[] getLines() {
-        return myLines;
-    }
+  public String getFileName() {
+    return myFileName;
+  }
 
-    public String toString() {
-        String toString = "";
-        for (int i = 0, myLinesLength = myLines.length; i < myLinesLength; i++) {
-            LineMapData line = myLines[i];
-            if (line != null) {
-                toString += "\n" + line.toString();
-            }
-        }
-        return "class name: " + myClassName + "\nlines:" + toString;
+  public LineMapData[] getLines() {
+    return myLines;
+  }
+
+  public String toString() {
+    StringBuilder toString = new StringBuilder();
+    for (LineMapData line : myLines) {
+      toString.append("\n").append(line);
     }
+    return "class name: " + myClassName + "\nlines:" + toString;
+  }
 }

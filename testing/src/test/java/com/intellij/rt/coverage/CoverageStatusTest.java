@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2014 JetBrains s.r.o.
+ * Copyright 2000-2023 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,171 +19,211 @@ package com.intellij.rt.coverage;
 import com.intellij.rt.coverage.data.ClassData;
 import com.intellij.rt.coverage.data.LineData;
 import com.intellij.rt.coverage.data.ProjectData;
-import com.intellij.rt.coverage.util.ProjectDataLoader;
-import consulo.java.coverage.TestPathUtil;
-import javax.tools.ToolProvider;
-import junit.framework.Assert;
+import com.intellij.rt.coverage.util.*;
+import com.sun.tools.javac.Main;
 import junit.framework.TestCase;
+import org.junit.Assert;
+
+import com.intellij.rt.coverage.util.ResourceUtil;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * @author anna
  * @since 22-May-2008
  */
-public class CoverageStatusTest extends TestCase
-{
-	private File myDataFile;
-	private File myClassFile;
+public class CoverageStatusTest extends TestCase {
+  private File myDataFile;
+  private File myClassFile;
 
-	@Override
-	protected void tearDown() throws Exception
-	{
-		myDataFile.delete();
-		myClassFile.delete();
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    if (myDataFile != null) {
+      File logFile = getLogFile();
+      if (logFile.exists()) logFile.delete();
+      myDataFile.delete();
+    }
+    if (myClassFile != null) myClassFile.delete();
+    super.tearDown();
+  }
 
-	public void testSimple() throws Exception
-	{
-		doTest("simple", "1:NONE\n" + "3:FULL\n" + "4:PARTIAL\n" + "5:FULL\n" + "6:FULL\n" + "8:NONE\n" + "11:PARTIAL\n" + "13:FULL\n" + "14:FULL\n" + "16:NONE\n");
-	}
+  private File getLogFile() {
+    String logFileName = ErrorReporter.ERROR_FILE;
+    File logFile = new File(myDataFile.getParent(), logFileName);
+    if (!logFile.exists()) {
+      logFile = new File(logFileName);
+    }
+    return logFile;
+  }
 
-	public void testStaticFieldInInterface() throws Exception
-	{
-		doTest("staticFieldInInterface", "1:FULL\n" + "4:PARTIAL\n" + "5:FULL\n" + "6:FULL\n" + "7:NONE\n" + "8:NONE\n" + "11:PARTIAL\n" + "13:NONE\n" + "14:NONE\n" + "16:FULL\n" + "18:FULL\n" +
-				"19:FULL\n" + "24:FULL\n" + "29:FULL\n" + "30:FULL\n" + "34:FULL\n");
-	}
+  public void testSimple() throws Exception {
+    doTest("simple", "1:NONE\n" +
+            "3:FULL\n" +
+            "4:PARTIAL\n" +
+            "5:FULL\n" +
+            "6:FULL\n" +
+            "8:NONE\n" +
+            "11:PARTIAL\n" +
+            "13:FULL\n" +
+            "16:NONE\n");
+  }
 
-	public void testNotExpressions() throws Exception
-	{
-		doTest("notExpressions", "1:FULL\n" + "3:FULL\n" + "7:FULL\n" + "8:FULL\n" + "9:FULL\n" + "10:FULL\n" + "11:FULL\n" + "12:FULL\n");
-	}
+  public void testStaticFieldInInterface() throws Exception {
+    String expected = Double.parseDouble(System.getProperty("java.specification.version")) < 1.8 ?
+        "1:FULL\n" +
+            "4:PARTIAL\n" +
+            "5:FULL\n" +
+            "6:FULL\n" +
+            "7:NONE\n" +
+            "8:NONE\n" +
+            "11:PARTIAL\n" +
+            "13:NONE\n" +
+            "16:FULL\n" +
+            "18:FULL\n" +
+            "19:FULL\n" +
+            "24:FULL\n" +
+            "29:FULL\n" +
+            "30:FULL\n" +
+            "34:FULL\n" :
+        "1:FULL\n" +
+            "4:PARTIAL\n" +
+            "5:FULL\n" +
+            "6:FULL\n" +
+            "7:NONE\n" +
+            "8:NONE\n" +
+            "11:PARTIAL\n" +
+            "13:NONE\n" +
+            "16:FULL\n" +
+            "18:FULL\n" +
+            "19:FULL\n" +
+            "23:FULL\n" +
+            "24:FULL\n" +
+            "28:FULL\n" +
+            "29:FULL\n" +
+            "30:FULL\n" +
+            "34:FULL\n";
+    doTest("staticFieldInInterface", expected);
+  }
 
-	public void testBranches() throws Exception
-	{
-		doTest("branches", "1:NONE\n" + "3:FULL\n" + "4:PARTIAL\n" + "5:PARTIAL\n" + "6:NONE\n");
-	}
+  public void testNotExpressions() throws Exception {
+    doTest("notExpressions", "1:FULL\n" +
+            "3:FULL\n" +
+            "7:FULL\n" +
+            "8:FULL\n" +
+            "9:FULL\n" +
+            "10:FULL\n" +
+            "11:FULL\n" +
+            "12:FULL\n");
+  }
 
-	public void testLongClass() throws Exception
-	{
-		StringBuilder expectedBuilder = new StringBuilder("1:NONE\n" + "3:FULL\n");
-		for(int line = 32004; line <= 34004; line++)
-		{
-			expectedBuilder.append(line).append(":FULL\n");
-		}
-		doTest("longClass", expectedBuilder.toString(), true);
-	}
+  public void testBranches() throws Exception {
+    doTest("branches", "1:NONE\n" +
+            "3:FULL\n" +
+            "4:PARTIAL\n" +
+            "5:PARTIAL\n" +
+            "6:NONE\n");
+  }
 
-	public void testLongClassTracing() throws Exception
-	{
-		StringBuilder expectedBuilder = new StringBuilder("1:NONE\n" + "3:FULL\n");
-		for(int line = 32004; line < 34004; line++)
-		{
-			expectedBuilder.append(line).append(":FULL\n");
-		}
-		doTest("longClass", expectedBuilder.toString());
-	}
+  public void _testLambda() throws Exception {
+    doTest("lambda", "1:NONE\n" +
+            "3:FULL\n" +
+            "4:FULL\n" +
+            "5:FULL\n" +
+            "10:FULL\n");
+  }
 
-	private void doTest(final String className, String expected) throws Exception
-	{
-		doTest(className, expected, false);
-	}
+  public void testLongClass() throws Exception {
+    StringBuilder expectedBuilder = new StringBuilder("1:NONE\n" +
+        "3:FULL\n");
+    for (int line = 32004; line < 34004; line++) {
+      expectedBuilder.append(line).append(":FULL\n");
+    }
+    doTest("longClass", expectedBuilder.toString(), false);
+  }
 
-	private void doTest(final String className, String expected, boolean sampling) throws Exception
-	{
-		final String testDataPath = TestPathUtil.getTestPath() + File.separator + "coverage" + File.separator + className;
+  public void testLongClassBranchCoverage() throws Exception {
+    StringBuilder expectedBuilder = new StringBuilder("1:NONE\n" +
+        "3:FULL\n");
+    for (int line = 32004; line < 34004; line++) {
+      expectedBuilder.append(line).append(":FULL\n");
+    }
+    doTest("longClass", expectedBuilder.toString());
+  }
 
-		myDataFile = new File(testDataPath + File.separator + "Test.ic");
+  public void testNotNullAssertionsAreIgnored() throws Exception {
+    String className = "WithNotNulls";
+    String testDataPath = new File(getClass().getClassLoader().getResource(className + ".class").getPath()).getParent();
+    myDataFile = new File( getTestPath("notNull") + File.separator + "Test.ic");
+    final ProjectData projectInfo = CoverageRunner.runCoverage(testDataPath, myDataFile, className + ".*", className, true);
+    final ClassData classInfo = projectInfo.getClassData(className);
+    assertNotNull(classInfo);
+    final LineData line = classInfo.getLineData(6);
+    assertNotNull(line);
+    assertNull(line.getJumps());
+  }
 
-		if(ToolProvider.getSystemJavaCompiler().run(null, null, null, new String[]{
-				"-nowarn",
-				"-proc:none",
-				testDataPath + File.separator + "Test.java"
-		}) != 0)
-		{
-			throw new RuntimeException("Compilation failed");
-		}
+  public void testIncompleteAgentArguments() throws Exception {
+    final String testDataPath = prepareForAgentRun("simple");
+    String coverageAgentPath = ResourceUtil.getAgentPath("intellij-coverage-agent");
+    String[] commandLine = {
+        "-javaagent:" + coverageAgentPath + "=\"" + myDataFile.getPath() + "\"",
+        "-classpath", testDataPath, "Test"};
+    try {
+      ProcessUtil.execJavaProcess(commandLine);
+      Assert.fail();
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().endsWith("Actual code = 1"));
+    }
+  }
 
-		myClassFile = new File(testDataPath + File.separator + "Test.class");
+  private String getTestPath(String testName) {
+    return ResourceUtil.getResourceRoot(getClass()) + File.separator + "testData" + File.separator + "coverage" + File.separator + testName;
+  }
 
-		final ProjectData projectInfo = runCoverage(testDataPath, myDataFile, "Test(\\$.*)*", "Test", sampling);
+  private String prepareForAgentRun(String testName) {
+    String testDataPath = getTestPath(testName);
+    myDataFile = new File(testDataPath + File.separator + "Test.ic");
+    if (Main.compile(new String[]{testDataPath + File.separator + "Test.java"}) != 0) {
+      throw new RuntimeException("Compilation failed");
+    }
+    myClassFile = new File(testDataPath + File.separator + "Test.class");
+    return testDataPath;
+  }
 
-		final StringBuilder buf = new StringBuilder();
+  private void doTest(final String className, String expected) throws Exception {
+    doTest(className, expected, true);
+  }
 
-		final ClassData classInfo = projectInfo.getClassData("Test");
+  private void doTest(final String className, String expected, boolean branchCoverage) throws Exception {
+    final String testDataPath = prepareForAgentRun(className);
 
-		assert classInfo != null;
+    final ProjectData projectInfo = CoverageRunner.runCoverage(testDataPath, myDataFile, "Test(\\$.*)*", "Test", branchCoverage);
 
-		final Object[] objects = classInfo.getLines();
-		final ArrayList<LineData> lines = new ArrayList<LineData>();
-		for(Object object : objects)
-		{
-			if(object != null)
-			{
-				lines.add((LineData) object);
-			}
-		}
-		Collections.sort(lines, (l1, l2) -> l1.getLineNumber() - l2.getLineNumber());
-		for(LineData info : lines)
-		{
-			buf.append(info.getLineNumber()).append(":").append(info.getStatus() == 0 ? "NONE" : info.getStatus() == 1 ? "PARTIAL" : "FULL").append("\n");
-		}
+    final StringBuilder buf = new StringBuilder();
 
-		Assert.assertEquals(expected, buf.toString());
-	}
+    final ClassData classInfo = projectInfo.getClassData("Test");
 
-	public static ProjectData runCoverage(String testDataPath, File coverageDataFile, final String patterns, String classToRun, final boolean sampling) throws Exception
-	{
-		String javaHome = System.getenv("JAVA_HOME");
-		if(javaHome == null)
-		{
-			throw new RuntimeException("JAVA_HOME environment variable needs to be set");
-		}
-		final String exePath = javaHome + File.separator + "bin" + File.separator + "java";
-		final String coverageAgentPath = TestPathUtil.getJarPath();
-		if(!new File(coverageAgentPath).exists())
-		{
-			throw new RuntimeException("Coverage agent does not exist. Please rebuild all artifacts to build it. Path: " + coverageAgentPath);
-		}
+    assert classInfo != null;
 
-		String[] commandLine = {
-				exePath,
-				//"-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5007",
-				"-javaagent:" + coverageAgentPath + "=\"" + coverageDataFile.getPath() + "\" false false false " + sampling + " " + patterns,
-				"-classpath",
-				testDataPath,
-				classToRun
-		};
-		StringBuilder cmd = new StringBuilder();
-		for(String s : commandLine)
-		{
-			cmd.append(s).append(" ");
-		}
-		System.out.println(cmd);
+    final Object[] objects = classInfo.getLines();
+    final ArrayList<LineData> lines = new ArrayList<LineData>();
+    for (Object object : objects) {
+      if (object != null) {
+        lines.add((LineData)object);
+      }
+    }
+    Collections.sort(lines, new Comparator<LineData>() {
+      public int compare(final LineData l1, final LineData l2) {
+        return l1.getLineNumber() - l2.getLineNumber();
+      }
+    });
+    for (LineData info : lines) {
+      buf.append(info.getLineNumber()).append(":").append(info.getStatus() == 0 ? "NONE" : info.getStatus() == 1 ? "PARTIAL" : "FULL").append("\n");
+    }
 
-		final Process process = new ProcessBuilder().command(commandLine).inheritIO().start();
-		int i = process.waitFor();
-		if(i != 0)
-		{
-			throw new IllegalArgumentException("failed with code " + i);
-		}
-		process.destroy();
-
-		int retries = 0;
-		while(!coverageDataFile.exists())
-		{
-			Thread.sleep(1000);
-			retries++;
-			if(retries > 10)
-			{
-				throw new RuntimeException("Timeout waiting for coverage data file to be created");
-			}
-		}
-		final ProjectData projectInfo = ProjectDataLoader.load(coverageDataFile);
-		assert projectInfo != null;
-		return projectInfo;
-	}
+    assertEquals(expected, buf.toString());
+  }
 }

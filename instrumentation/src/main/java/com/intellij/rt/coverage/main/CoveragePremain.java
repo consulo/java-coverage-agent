@@ -17,17 +17,21 @@
 package com.intellij.rt.coverage.main;
 
 import java.lang.instrument.Instrumentation;
-
-import com.intellij.rt.coverage.instrumentation.Instrumentator;
+import java.lang.reflect.Method;
 
 /**
  * @author anna
  * @since 25-Feb-2010
  */
-public class CoveragePremain
-{
-	public static void premain(String argsString, Instrumentation instrumentation) throws Exception
-	{
-		Instrumentator.premain(argsString, instrumentation);
-	}
+public class CoveragePremain {
+  public static void premain(String argsString, Instrumentation instrumentation) throws Exception {
+    premain(argsString, instrumentation,
+        "com.intellij.rt.coverage.instrumentation.Instrumentator");
+  }
+
+  public static void premain(String argsString, Instrumentation instrumentation, String instrumenterName) throws Exception {
+    final Class<?> instrumentator = Class.forName(instrumenterName, true, CoveragePremain.class.getClassLoader());
+    final Method premainMethod = instrumentator.getDeclaredMethod("premain", String.class, Instrumentation.class);
+    premainMethod.invoke(null, argsString, instrumentation);
+  }
 }

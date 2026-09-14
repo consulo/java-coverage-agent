@@ -17,6 +17,7 @@
 package com.intellij.rt.coverage.data;
 
 import com.intellij.rt.coverage.util.CoverageIOUtil;
+import com.intellij.rt.coverage.util.ErrorReporter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -27,149 +28,163 @@ import java.util.List;
  * @author Pavel.Sher
  */
 public class JumpsAndSwitches implements CoverageData {
-    private List myJumps;
-    private JumpData[] myJumpsArray;
+  private List<JumpData> myJumps;
+  private JumpData[] myJumpsArray;
 
-    private List mySwitches;
-    private SwitchData[] mySwitchesArray;
+  private List<SwitchData> mySwitches;
+  private SwitchData[] mySwitchesArray;
 
-    public JumpData[] getJumps() {
-        return myJumpsArray;
+  public JumpData[] getJumps() {
+    return myJumpsArray;
+  }
+
+  public SwitchData[] getSwitches() {
+    return mySwitchesArray;
+  }
+
+  public JumpData addJump(final int jump) {
+    if (myJumps == null) myJumps = new ArrayList<JumpData>();
+    if (myJumps.size() <= jump) {
+      for (int i = myJumps.size(); i <= jump; i++){
+        myJumps.add(new JumpData());
+      }
     }
+    return myJumps.get(jump);
+  }
 
-    public SwitchData[] getSwitches() {
-        return mySwitchesArray;
-    }
+  public JumpData getJumpData(int jump) {
+    return myJumpsArray == null ? (myJumps == null ? null : myJumps.get(jump)) : myJumpsArray[jump];
+  }
 
-    public JumpData addJump(int jump) {
-        if (myJumps == null) {
-            myJumps = new ArrayList();
-        }
-        if (myJumps.size() <= jump) {
-            for (int i = myJumps.size(); i <= jump; i++) {
-                myJumps.add(new JumpData());
-            }
-        }
-        return (JumpData)myJumps.get(jump);
+  public SwitchData addSwitch(final int switchNumber, final int[] keys) {
+    if (mySwitches == null) mySwitches = new ArrayList<SwitchData>();
+    final SwitchData switchData = new SwitchData(keys);
+    if (mySwitches.size() <= switchNumber) {
+      for(int i = mySwitches.size(); i < switchNumber; i++) {
+        mySwitches.add(new SwitchData(new int[0]));
+      }
+      if (mySwitches.size() == switchNumber) {
+        mySwitches.add(switchData);
+      }
     }
+    return mySwitches.get(switchNumber);
+  }
 
-    public JumpData getJumpData(int jump) {
-        return myJumpsArray == null ? null : myJumpsArray[jump];
+  public void removeSwitch(int switchNumber) {
+    if (0 <= switchNumber && switchNumber < mySwitches.size()) {
+      mySwitches.remove(switchNumber);
+    } else {
+      ErrorReporter.warn("Remove switch", new ArrayIndexOutOfBoundsException(switchNumber));
     }
+  }
 
-    public SwitchData addSwitch(int switchNumber, int[] keys) {
-        if (mySwitches == null) {
-            mySwitches = new ArrayList();
-        }
-        SwitchData switchData = new SwitchData(keys);
-        if (mySwitches.size() <= switchNumber) {
-            for (int i = mySwitches.size(); i < switchNumber; i++) {
-                mySwitches.add(new SwitchData(new int[0]));
-            }
-            if (mySwitches.size() == switchNumber) {
-                mySwitches.add(switchData);
-            }
-        }
-        return (SwitchData)mySwitches.get(switchNumber);
-    }
+  public SwitchData getSwitchData(int switchNumber) {
+    return mySwitchesArray == null ? (mySwitches == null ? null : mySwitches.get(switchNumber)) : mySwitchesArray[switchNumber];
+  }
 
-    public SwitchData getSwitchData(int switchNumber) {
-        return mySwitchesArray == null ? null : mySwitchesArray[switchNumber];
+  public void save(final DataOutputStream os) throws IOException {
+    CoverageIOUtil.writeINT(os, myJumpsArray != null ? myJumpsArray.length : 0);
+    if (myJumpsArray != null) {
+      for (JumpData aMyJumpsArray : myJumpsArray) {
+        aMyJumpsArray.save(os);
+      }
     }
+    CoverageIOUtil.writeINT(os, mySwitchesArray != null ? mySwitchesArray.length : 0);
+    if (mySwitchesArray != null) {
+      for (SwitchData aMySwitchesArray : mySwitchesArray) {
+        aMySwitchesArray.save(os);
+      }
+    }
+  }
 
-    public void save(DataOutputStream os) throws IOException {
-        CoverageIOUtil.writeINT(os, myJumpsArray != null ? myJumpsArray.length : 0);
-        if (myJumpsArray != null) {
-            for (int j = 0; j < myJumpsArray.length; j++) {
-                myJumpsArray[j].save(os);
-            }
-        }
-        CoverageIOUtil.writeINT(os, mySwitchesArray != null ? mySwitchesArray.length : 0);
-        if (mySwitchesArray != null) {
-            for (int s = 0; s < mySwitchesArray.length; s++) {
-                mySwitchesArray[s].save(os);
-            }
-        }
+  public void removeJump(final int jump) {
+    if (0 <= jump && jump < myJumps.size()) {
+      myJumps.remove(jump);
+    } else {
+      ErrorReporter.warn("Remove jump", new ArrayIndexOutOfBoundsException(jump));
     }
+  }
 
-    public void removeJump(int jump) {
-        if (jump > 0 && jump <= myJumps.size()) {
-            myJumps.remove(jump - 1);
-        }
+  public void fillArrays() {
+    if (myJumps != null) {
+      myJumpsArray = new JumpData[myJumps.size()];
+      for (int i = 0; i < myJumps.size(); i++) {
+        myJumpsArray[i] = myJumps.get(i);
+      }
+      myJumps = null;
     }
+    if (mySwitches != null) {
+      mySwitchesArray = new SwitchData[mySwitches.size()];
+      for (int i = 0; i < mySwitches.size(); i++) {
+        mySwitchesArray[i] = mySwitches.get(i);
+      }
+      mySwitches = null;
+    }
+  }
 
-    public void fillArrays() {
-        if (myJumps != null) {
-            myJumpsArray = new JumpData[myJumps.size()];
-            for (int i = 0; i < myJumps.size(); i++) {
-                myJumpsArray[i] = (JumpData)myJumps.get(i);
-            }
-            myJumps = null;
+  public void merge(final CoverageData data) {
+    JumpsAndSwitches jumpsData = (JumpsAndSwitches)data;
+    if (jumpsData.myJumpsArray != null) {
+      if (myJumpsArray == null) {
+        myJumpsArray = new JumpData[jumpsData.myJumpsArray.length];
+      }
+      else {
+        if (myJumpsArray.length < jumpsData.myJumpsArray.length) {
+          JumpData[] extJumpsArray = new JumpData[jumpsData.myJumpsArray.length];
+          System.arraycopy(myJumpsArray, 0, extJumpsArray, 0, myJumpsArray.length);
+          myJumpsArray = extJumpsArray;
         }
-        if (mySwitches != null) {
-            mySwitchesArray = new SwitchData[mySwitches.size()];
-            for (int i = 0; i < mySwitches.size(); i++) {
-                mySwitchesArray[i] = (SwitchData)mySwitches.get(i);
-            }
-            mySwitches = null;
-        }
+      }
+      mergeJumps(myJumpsArray, jumpsData.myJumpsArray);
     }
+    if (jumpsData.mySwitchesArray != null) {
+      if (mySwitchesArray == null) {
+        mySwitchesArray = new SwitchData[jumpsData.mySwitchesArray.length];
+      }
+      else {
+        if (mySwitchesArray.length < jumpsData.mySwitchesArray.length) {
+          SwitchData[] extJumpsArray = new SwitchData[jumpsData.mySwitchesArray.length];
+          System.arraycopy(mySwitchesArray, 0, extJumpsArray, 0, mySwitchesArray.length);
+          mySwitchesArray = extJumpsArray;
+        }
+      }
+      mergeSwitches(mySwitchesArray, jumpsData.mySwitchesArray);
+    }
+  }
 
-    public void merge(CoverageData data) {
-        JumpsAndSwitches jumpsData = (JumpsAndSwitches)data;
-        if (jumpsData.myJumpsArray != null) {
-            if (myJumpsArray == null) {
-                myJumpsArray = new JumpData[jumpsData.myJumpsArray.length];
-            }
-            else if (jumpsData.myJumpsArray != null) {
-                if (myJumpsArray.length < jumpsData.myJumpsArray.length) {
-                    JumpData[] extJumpsArray = new JumpData[jumpsData.myJumpsArray.length];
-                    System.arraycopy(myJumpsArray, 0, extJumpsArray, 0, myJumpsArray.length);
-                    myJumpsArray = extJumpsArray;
-                }
-            }
-            mergeJumps(myJumpsArray, jumpsData.myJumpsArray);
-        }
-        if (jumpsData.mySwitchesArray != null) {
-            if (mySwitchesArray == null) {
-                mySwitchesArray = new SwitchData[jumpsData.mySwitchesArray.length];
-            }
-            else if (jumpsData.mySwitchesArray != null) {
-                if (mySwitchesArray.length < jumpsData.mySwitchesArray.length) {
-                    SwitchData[] extJumpsArray = new SwitchData[jumpsData.mySwitchesArray.length];
-                    System.arraycopy(mySwitchesArray, 0, extJumpsArray, 0, mySwitchesArray.length);
-                    mySwitchesArray = extJumpsArray;
-                }
-            }
-            mergeSwitches(mySwitchesArray, jumpsData.mySwitchesArray);
-        }
+  private static void mergeSwitches(SwitchData[] myArray, SwitchData[] array) {
+    for (int i = 0; i < array.length; i++) {
+      SwitchData switchData = myArray[i];
+      if (switchData == null) {
+        if (array[i] == null) continue;
+        switchData = new SwitchData(array[i].getKeys());
+        myArray[i] = switchData;
+      }
+      switchData.merge(array[i]);
     }
+  }
 
-    private static void mergeSwitches(SwitchData[] myArray, SwitchData[] array) {
-        for (int i = 0; i < array.length; i++) {
-            SwitchData switchData = myArray[i];
-            if (switchData == null) {
-                if (array[i] == null) {
-                    continue;
-                }
-                switchData = new SwitchData(array[i].getKeys());
-                myArray[i] = switchData;
-            }
-            switchData.merge(array[i]);
-        }
+  private static void mergeJumps(JumpData[] myArray, JumpData[] array) {
+    for (int i = 0; i < array.length; i++) {
+      JumpData switchData = myArray[i];
+      if (switchData == null) {
+        if (array[i] == null) continue;
+        switchData = new JumpData();
+        myArray[i] = switchData;
+      }
+      switchData.merge(array[i]);
     }
+  }
 
-    private static void mergeJumps(JumpData[] myArray, JumpData[] array) {
-        for (int i = 0; i < array.length; i++) {
-            JumpData switchData = myArray[i];
-            if (switchData == null) {
-                if (array[i] == null) {
-                    continue;
-                }
-                switchData = new JumpData();
-                myArray[i] = switchData;
-            }
-            switchData.merge(array[i]);
-        }
-    }
+  public int jumpsCount() {
+    if (myJumps != null) return myJumps.size();
+    if (myJumpsArray != null) return myJumpsArray.length;
+    return 0;
+  }
+
+  public int switchesCount() {
+    if (mySwitches != null) return mySwitches.size();
+    if (mySwitchesArray != null) return mySwitchesArray.length;
+    return 0;
+  }
 }

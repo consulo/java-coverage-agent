@@ -22,41 +22,61 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class JumpData implements CoverageData {
-    private int myTrueHits;
-    private int myFalseHits;
+  private int myTrueHits;
+  private int myFalseHits;
 
-    public void touchTrueHit() {
-        myTrueHits++;
-    }
+  private int myTrueId = -1;
+  private int myFalseId = -1;
 
-    public void touchFalseHit() {
-        myFalseHits++;
-    }
+  public void touchTrueHit() {
+    myTrueHits++;
+  }
 
-    public int getTrueHits() {
-        return myTrueHits;
-    }
+  public void touchFalseHit() {
+    myFalseHits++;
+  }
 
-    public int getFalseHits() {
-        return myFalseHits;
-    }
+  public int getTrueHits() {
+    return myTrueHits;
+  }
 
-    public void save(DataOutputStream os) throws IOException {
-        CoverageIOUtil.writeINT(os, myTrueHits);
-        CoverageIOUtil.writeINT(os, myFalseHits);
-    }
+  public int getFalseHits() {
+    return myFalseHits;
+  }
 
-    public void merge(CoverageData data) {
-        JumpData jumpData = (JumpData)data;
-        myTrueHits += jumpData.myTrueHits;
-        myFalseHits += jumpData.myFalseHits;
-    }
+  public void save(final DataOutputStream os) throws IOException {
+    CoverageIOUtil.writeINT(os, myTrueHits);
+    CoverageIOUtil.writeINT(os, myFalseHits);
+  }
 
-    public void setTrueHits(int trueHits) {
-        myTrueHits = trueHits;
-    }
+  public void merge(final CoverageData data) {
+    final JumpData jumpData = (JumpData) data;
+    setTrueHits(myTrueHits + jumpData.myTrueHits);
+    setFalseHits(myFalseHits + jumpData.myFalseHits);
+    if (jumpData.myFalseId != -1) myFalseId = jumpData.myFalseId;
+    if (jumpData.myTrueId != -1) myTrueId = jumpData.myTrueId;
+  }
 
-    public void setFalseHits(int falseHits) {
-        myFalseHits = falseHits;
+  public void setTrueHits(final int trueHits) {
+    myTrueHits = ClassData.trimHits(trueHits);
+  }
+
+  public void setFalseHits(final int falseHits) {
+    myFalseHits = ClassData.trimHits(falseHits);
+  }
+
+  public int getId(boolean type) {
+    return type ? myTrueId : myFalseId;
+  }
+
+  /**
+   * Branch ID is used to store coverage data in an array at runtime.
+   */
+  public void setId(int id, boolean type) {
+    if (type) {
+      myTrueId = id;
+    } else {
+      myFalseId = id;
     }
+  }
 }
