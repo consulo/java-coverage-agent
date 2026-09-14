@@ -23,7 +23,8 @@ import com.intellij.rt.coverage.util.StringsPool;
 import consulo.internal.org.objectweb.asm.ClassVisitor;
 import consulo.internal.org.objectweb.asm.MethodVisitor;
 import consulo.internal.org.objectweb.asm.Opcodes;
-import gnu.trove.TIntObjectHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class Instrumenter extends ClassVisitor {
   protected final ProjectData myProjectData;
@@ -31,7 +32,7 @@ public abstract class Instrumenter extends ClassVisitor {
   private final String myClassName;
   private final boolean myShouldCalculateSource;
 
-  protected TIntObjectHashMap myLines = new TIntObjectHashMap(4, 0.99f);
+  protected Map<Integer, LineData> myLines = new HashMap<Integer, LineData>(4, 0.99f);
   protected int myMaxLineNumber;
 
   protected ClassData myClassData;
@@ -91,8 +92,8 @@ public abstract class Instrumenter extends ClassVisitor {
 
   protected void getOrCreateLineData(int line, String name, String desc) {
     //create lines again if class was loaded again by another class loader; may be myLinesArray should be cleared
-    if (myLines == null) myLines = new TIntObjectHashMap();
-    LineData lineData = (LineData) myLines.get(line);
+    if (myLines == null) myLines = new HashMap<Integer, LineData>();
+    LineData lineData = myLines.get(line);
     if (lineData == null) {
       lineData = new LineData(line, StringsPool.getFromPool(name + desc));
       myLines.put(line, lineData);

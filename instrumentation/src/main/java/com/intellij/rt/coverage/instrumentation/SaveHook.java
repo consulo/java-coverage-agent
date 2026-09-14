@@ -24,7 +24,6 @@ import com.intellij.rt.coverage.util.*;
 import com.intellij.rt.coverage.util.classFinder.ClassEntry;
 import com.intellij.rt.coverage.util.classFinder.ClassFinder;
 import consulo.internal.org.objectweb.asm.ClassReader;
-import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntObjectProcedure;
 import gnu.trove.TObjectIntHashMap;
 
@@ -188,7 +187,7 @@ public class SaveHook implements Runnable {
                 SourceLineCounter slc = new SourceLineCounter(cd, !projectData.isSampling(), mySourceMapFile != null ? projectData : null);
                 reader.accept(slc, 0);
                 if (slc.getNSourceLines() > 0) { // ignore classes without executable code
-                    final TIntObjectHashMap lines = new TIntObjectHashMap(4, 0.99f);
+                    final Map<Integer, LineData> lines = new HashMap<Integer, LineData>(4, 0.99f);
                     final int[] maxLine = new int[]{1};
                     final ClassData classData = projectData.getOrCreateClassData(StringsPool.getFromPool(classEntry.getClassName()));
                     slc.getSourceLines().forEachEntry(new TIntObjectProcedure() {
