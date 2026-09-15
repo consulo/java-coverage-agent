@@ -92,7 +92,7 @@ public class CoverageReport {
 
       CoverageIOUtil.writeINT(os, ProjectDataLoader.REPORT_VERSION);
       CoverageIOUtil.writeUTF(os, getExtraInfoString());
-      ReportSectionsUtil.saveSections(projectData, os, dict, options);
+      ReportSectionsUtil.saveSections(projectData, os, dict, options.isBranchCoverage);
 
       saveSourceMap(classes, options.sourceMapFile);
     } catch (IOException e) {

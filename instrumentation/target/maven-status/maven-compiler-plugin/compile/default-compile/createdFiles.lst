@@ -1,4 +1,3 @@
-com/intellij/rt/coverage/util/ReportSectionsUtil.class
 com/intellij/rt/coverage/instrumentation/data/SwitchLabels.class
 com/intellij/rt/coverage/instrumentation/filters/lines/KotlinDeprecatedMethodFilter.class
 com/intellij/rt/coverage/instrumentation/UnloadedUtil$3.class
@@ -21,11 +20,9 @@ com/intellij/rt/coverage/instrumentation/filters/branches/BooleanOperatorFilter.
 com/intellij/rt/coverage/instrumentation/CoverageRuntime$ClassesMap.class
 com/intellij/rt/coverage/instrumentation/testTracking/TestTrackingArrayMode.class
 com/intellij/rt/coverage/instrumentation/filters/branches/KotlinWhenMappingExceptionFilter.class
-com/intellij/rt/coverage/util/ProjectDataLoader.class
 com/intellij/rt/coverage/instrumentation/InstrumentationUtils$1.class
 com/intellij/rt/coverage/instrumentation/filters/lines/KotlinDeprecatedMethodFilter$1.class
 com/intellij/rt/coverage/instrumentation/AbstractIntellijClassfileTransformer$1.class
-com/intellij/rt/coverage/util/InstructionsSection.class
 com/intellij/rt/coverage/instrumentation/ExtraFieldInstrumenter$1.class
 com/intellij/rt/coverage/instrumentation/Instrumentator$1.class
 com/intellij/rt/coverage/instrumentation/filters/lines/KotlinImplementerDefaultInterfaceMemberFilter.class
@@ -43,19 +40,16 @@ com/intellij/rt/coverage/instrumentation/dataAccess/DataAccessUtil.class
 com/intellij/rt/coverage/instrumentation/InstrumentationUtils$MethodDescriptor.class
 com/intellij/rt/coverage/instrumentation/filters/methods/KotlinSyntheticConstructorOfSealedClassFilter.class
 com/intellij/rt/coverage/instrumentation/testTracking/TestTrackingArrayMode$1.class
-com/intellij/rt/coverage/util/ClassListSection$1.class
 com/intellij/rt/coverage/instrumentation/filters/classFilter/KotlinClassMarkerFilter.class
 com/intellij/rt/coverage/instrumentation/filters/branches/KotlinWhenMappingExceptionFilter$PositionData.class
 com/intellij/rt/coverage/instrumentation/CoverageRuntime.class
 com/intellij/rt/coverage/instrumentation/filters/FilterUtils.class
 com/intellij/rt/coverage/instrumentation/filters/branches/KotlinDefaultArgsBranchFilter.class
-com/intellij/rt/coverage/instrumentation/util/LinesUtil.class
 com/intellij/rt/coverage/instrumentation/InstrumentationUtils$3.class
 com/intellij/rt/coverage/instrumentation/InstrumentationVisitor$HitsVisitor.class
 com/intellij/rt/coverage/instrumentation/filters/methods/KotlinLocalFunctionInsideIgnoredMethodFilter.class
 com/intellij/rt/coverage/instrumentation/filters/methods/MethodFilter.class
 com/intellij/rt/coverage/instrumentation/data/ProjectContext$1.class
-com/intellij/rt/coverage/util/PartlyAnalysedClassesSection.class
 com/intellij/rt/coverage/instrumentation/CoverageEnumeratorWithInstructions.class
 com/intellij/rt/coverage/instrumentation/util/InsertLineAfterJumpVisitor.class
 com/intellij/rt/coverage/instrumentation/dataAccess/NameCoverageDataAccess.class
@@ -70,12 +64,10 @@ com/intellij/rt/coverage/instrumentation/filters/compose/ComposeSkipGroupLineFil
 com/intellij/rt/coverage/instrumentation/filters/classes/ClassSignatureFilter.class
 com/intellij/rt/coverage/instrumentation/InstrumentationOptions$Builder.class
 com/intellij/rt/coverage/instrumentation/filters/lines/CoverageFilter.class
-com/intellij/rt/coverage/util/IncludePatternsSection.class
 com/intellij/rt/coverage/instrumentation/testTracking/TestTrackingArrayInstrumenter$1.class
 com/intellij/rt/coverage/instrumentation/InstrumentationVisitor$2.class
 com/intellij/rt/coverage/instrumentation/filters/classFilter/KotlinValueClassFilter$3.class
 com/intellij/rt/coverage/instrumentation/data/FilteredMethodStorage.class
-com/intellij/rt/coverage/util/ReportSection.class
 com/intellij/rt/coverage/instrumentation/filters/branches/JavaStringSwitchFilter.class
 com/intellij/rt/coverage/instrumentation/filters/classFilter/InheritanceCollectorFilter.class
 com/intellij/rt/coverage/instrumentation/filters/branches/KotlinLateinitFilter.class
@@ -112,8 +104,6 @@ com/intellij/rt/coverage/instrumentation/CoverageRuntime$IdentityClassData.class
 com/intellij/rt/coverage/instrumentation/UnloadedUtil$1.class
 com/intellij/rt/coverage/instrumentation/filters/lines/KotlinImplementerDefaultInterfaceMemberFilter$State.class
 com/intellij/rt/coverage/instrumentation/CoverageArgs.class
-com/intellij/rt/coverage/util/ProjectDataLoader$1.class
-com/intellij/rt/coverage/util/UncoveredBranchesSection.class
 com/intellij/rt/coverage/instrumentation/filters/branches/KotlinWhenStringFilter.class
 com/intellij/rt/coverage/instrumentation/dataAccess/EmptyCoverageDataAccess.class
 com/intellij/rt/coverage/instrumentation/AbstractIntellijClassfileTransformer.class
@@ -123,7 +113,6 @@ com/intellij/rt/coverage/instrumentation/JSR45Util$FileInfo.class
 com/intellij/rt/coverage/instrumentation/filters/classes/ClassIgnoredByAnnotationFilter.class
 com/intellij/rt/coverage/instrumentation/filters/methods/DeserializeLambdaFilter.class
 com/intellij/rt/coverage/instrumentation/filters/classFilter/PrivateConstructorOfUtilClassFilter$EmptyConstructorVisitor.class
-com/intellij/rt/coverage/util/ClassListSection.class
 com/intellij/rt/coverage/instrumentation/filters/lines/TryFinallyLineFilter$State.class
 com/intellij/rt/coverage/instrumentation/JSR45Util.class
 com/intellij/rt/coverage/instrumentation/testTracking/TestTrackingClassDataInstrumenter.class

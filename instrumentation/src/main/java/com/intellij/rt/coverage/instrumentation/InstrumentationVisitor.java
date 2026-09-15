@@ -32,7 +32,7 @@ import com.intellij.rt.coverage.instrumentation.filters.FilterUtils;
 import com.intellij.rt.coverage.instrumentation.filters.lines.CoverageFilter;
 import com.intellij.rt.coverage.instrumentation.filters.methods.MethodFilter;
 import com.intellij.rt.coverage.instrumentation.util.InsertLineAfterJumpVisitor;
-import com.intellij.rt.coverage.instrumentation.util.LinesUtil;
+import com.intellij.rt.coverage.util.LinesUtil;
 import com.intellij.rt.coverage.util.ClassNameUtil;
 import com.intellij.rt.coverage.util.OptionsUtil;
 import consulo.internal.org.objectweb.asm.*;

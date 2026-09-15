@@ -18,7 +18,6 @@ package com.intellij.rt.coverage.util;
 
 import com.intellij.rt.coverage.data.ClassData;
 import com.intellij.rt.coverage.data.ProjectData;
-import com.intellij.rt.coverage.instrumentation.InstrumentationOptions;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TObjectIntHashMap;
 
@@ -41,7 +40,7 @@ public class IncludePatternsSection extends ReportSection {
   }
 
   @Override
-  public boolean isEngaged(ProjectData projectData, InstrumentationOptions options) {
+  public boolean isEngaged(ProjectData projectData, boolean branchCoverage) {
     return true;
   }
 

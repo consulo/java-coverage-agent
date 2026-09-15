@@ -18,7 +18,6 @@ package com.intellij.rt.coverage.util;
 
 import com.intellij.rt.coverage.data.ClassData;
 import com.intellij.rt.coverage.data.ProjectData;
-import com.intellij.rt.coverage.instrumentation.InstrumentationOptions;
 
 import java.io.DataInputStream;
 import java.io.DataOutput;
@@ -57,7 +56,7 @@ public class PartlyAnalysedClassesSection extends ClassListSection {
   }
 
   @Override
-  public boolean isEngaged(ProjectData projectData, InstrumentationOptions options) {
+  public boolean isEngaged(ProjectData projectData, boolean branchCoverage) {
     for (ClassData classData : projectData.getClassesCollection()) {
       if (!classData.isFullyAnalysed()) return true;
     }

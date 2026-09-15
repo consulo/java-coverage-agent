@@ -6,7 +6,7 @@
 
 	<groupId>consulo.internal</groupId>
 	<artifactId>java.coverage.agent.parent</artifactId>
-	<version>1.0</version>
+	<version>3.0</version>
 	<packaging>pom</packaging>
 
 	<repositories>

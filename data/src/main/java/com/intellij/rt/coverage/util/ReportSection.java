@@ -18,7 +18,6 @@ package com.intellij.rt.coverage.util;
 
 import com.intellij.rt.coverage.data.ClassData;
 import com.intellij.rt.coverage.data.ProjectData;
-import com.intellij.rt.coverage.instrumentation.InstrumentationOptions;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TObjectIntHashMap;
 
@@ -43,7 +42,7 @@ public abstract class ReportSection {
   /**
    * Check if this section should be added to the report.
    */
-  public abstract boolean isEngaged(ProjectData projectData, InstrumentationOptions options);
+  public abstract boolean isEngaged(ProjectData projectData, boolean branchCoverage);
 
   /**
    * Load data that was previously saved via <code>saveInternal</code> method.

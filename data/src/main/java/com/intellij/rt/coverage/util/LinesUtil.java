@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.intellij.rt.coverage.instrumentation.util;
+package com.intellij.rt.coverage.util;
 
 import com.intellij.rt.coverage.data.LineData;
 import gnu.trove.TIntObjectHashMap;

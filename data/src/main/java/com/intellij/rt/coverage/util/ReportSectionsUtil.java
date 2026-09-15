@@ -18,7 +18,6 @@ package com.intellij.rt.coverage.util;
 
 import com.intellij.rt.coverage.data.ClassData;
 import com.intellij.rt.coverage.data.ProjectData;
-import com.intellij.rt.coverage.instrumentation.InstrumentationOptions;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TObjectIntHashMap;
 
@@ -71,18 +70,18 @@ public class ReportSectionsUtil {
   }
 
   public static void saveSections(ProjectData projectData, DataOutputStream out,
-                                  TObjectIntHashMap<String> dict, InstrumentationOptions options) throws IOException {
-    List<ReportSection> sections = getEngagedSections(projectData, options);
+                                  TObjectIntHashMap<String> dict, boolean branchCoverage) throws IOException {
+    List<ReportSection> sections = getEngagedSections(projectData, branchCoverage);
     CoverageIOUtil.writeINT(out, sections.size());
     for (ReportSection section : sections) {
       section.save(projectData, out, dict);
     }
   }
 
-  private static List<ReportSection> getEngagedSections(ProjectData projectData, InstrumentationOptions options) {
+  private static List<ReportSection> getEngagedSections(ProjectData projectData, boolean branchCoverage) {
     List<ReportSection> engagedSections = new ArrayList<ReportSection>();
     for (ReportSection section : getSections(projectData).values()) {
-      if (section.isEngaged(projectData, options)) {
+      if (section.isEngaged(projectData, branchCoverage)) {
         engagedSections.add(section);
       }
     }
