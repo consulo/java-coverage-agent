@@ -4,6 +4,7 @@ out
 build
 .gradle
 .idea/
+.consulo/
 .kotlin/
 gradle.properties
 /tests/external.jmh.gradle
