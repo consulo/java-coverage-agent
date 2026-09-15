@@ -15,3 +15,6 @@ test-kotlin/bytecode.txt
 target/
 dependency-reduced-pom.xml
 coverage-error.log
+
+# checked-in test fixture (pre-compiled, cannot be built from source)
+!testing/src/test/resources/**/*.class
