@@ -10,3 +10,8 @@ gradle.properties
 /tests/external.jmh.gradle
 /*.patch
 test-kotlin/bytecode.txt
+
+# maven
+target/
+dependency-reduced-pom.xml
+coverage-error.log
